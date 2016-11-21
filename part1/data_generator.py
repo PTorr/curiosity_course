@@ -35,7 +35,7 @@ def main():
         E[i,1] = np.sum(data[data[:,0] == e,3])
         i += 1
 
-    plt.figure(1)
+    plt.figure('Energies distribution')
     plt.bar(E[:,0],E[:,1])
 
     A = np.empty([len(angles),2])
@@ -45,7 +45,7 @@ def main():
         A[i,1] = np.sum(data[data[:,1] == a,3])
         i += 1
 
-    plt.figure(2)
+    plt.figure('Angles distribution')
     plt.bar(A[:,0],A[:,1])
 
     D = np.empty([len(distances),2])
@@ -55,7 +55,7 @@ def main():
         D[i,1] = np.sum(data[data[:,2] == d,3])
         i += 1
 
-    plt.figure(3)
+    plt.figure('Distances distribution')
     plt.bar(E[:,0],E[:,1])
     plt.show()
 
