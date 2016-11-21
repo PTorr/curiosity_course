@@ -37,7 +37,6 @@ def main():
 
     plt.figure(1)
     plt.bar(E[:,0],E[:,1])
-    plt.show()
 
     A = np.empty([len(angles),2])
     i = 0
@@ -48,7 +47,6 @@ def main():
 
     plt.figure(2)
     plt.bar(A[:,0],A[:,1])
-    plt.show()
 
     D = np.empty([len(distances),2])
     i = 0
