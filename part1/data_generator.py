@@ -37,6 +37,8 @@ def main():
 
     plt.figure('Energies distribution')
     plt.bar(E[:,0],E[:,1])
+    plt.xlabel('Energy[J]')
+    plt.ylabel('Counts')
 
     A = np.empty([len(angles),2])
     i = 0
@@ -46,7 +48,9 @@ def main():
         i += 1
 
     plt.figure('Angles distribution')
-    plt.bar(A[:,0],A[:,1])
+    plt.bar(A[:,0],A[:,1],width=0.2)
+    plt.xlabel('Angles[radians]')
+    plt.ylabel('Counts')
 
     D = np.empty([len(distances),2])
     i = 0
@@ -56,7 +60,9 @@ def main():
         i += 1
 
     plt.figure('Distances distribution')
-    plt.bar(E[:,0],E[:,1])
+    plt.bar(D[:,0],D[:,1])
+    plt.xlabel('Distances[m]')
+    plt.ylabel('Counts')
     plt.show()
 
     # histogram
@@ -71,10 +77,12 @@ def main():
 
 def choose_theta():
     theta = np.random.choice(np.linspace(-89,90,10), 1)
+    # x=15
+    # theta = np.random.choice(np.linspace(x+0.5,x+0.5,1), 1)
     return np.round(theta*np.pi/180,2)
 
 def choose_energy():
-    energy = np.random.choice(np.linspace(0.01,25,10), 1)
+    energy = np.random.choice(np.linspace(0.01,25,6), 1)
     return np.round(energy_with_noise(energy))
 
 def energy_with_noise(energy):
