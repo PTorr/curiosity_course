@@ -28,6 +28,16 @@ def main():
     angles    = np.unique(data[:,1])
     distances = np.unique(data[:,2])
 
+    # plot_data(energies, angles, distances, data)
+    print energy_fixed_angle_probability(energies,data,angles[0],energies[0])
+
+def energy_fixed_angle_probability(energies,data,fixed_angle,wanted_energy):
+    dd = np.empty([len(energies), 2])
+    dd[:, 0] = data[data[:, 1] == fixed_angle, 0] # energy
+    dd[:, 1] = data[data[:, 1] == fixed_angle, 3] # counts
+    return sum(sum([dd[dd[:, 0] == wanted_energy, 1]]) / sum(dd[:, 1]))
+
+def plot_data(energies,angles,distances,data):
     E = np.empty([len(energies),2])
     i = 0
     for e in energies:
@@ -48,8 +58,8 @@ def main():
         i += 1
 
     plt.figure('Angles distribution')
-    plt.bar(A[:,0],A[:,1],width=0.2)
-    plt.xlabel('Angles[radians]')
+    plt.bar(A[:,0]*180/np.pi,A[:,1])
+    plt.xlabel('Angles[degree]')
     plt.ylabel('Counts')
 
     D = np.empty([len(distances),2])
@@ -65,24 +75,15 @@ def main():
     plt.ylabel('Counts')
     plt.show()
 
-    # histogram
-    # X = np.arange(len(P))
-    # pl.bar(X, P.values(), align='center', width=0.5)
-    # pl.xticks(X, P.keys())
-    # ymax = max(P.values()) + 1
-    # pl.ylim(0, ymax)
-    # pl.show()
-
-
 
 def choose_theta():
-    theta = np.random.choice(np.linspace(-89,90,10), 1)
+    theta = np.random.choice(np.linspace(0,90,3), 1)
     # x=15
     # theta = np.random.choice(np.linspace(x+0.5,x+0.5,1), 1)
     return np.round(theta*np.pi/180,2)
 
 def choose_energy():
-    energy = np.random.choice(np.linspace(0.01,25,6), 1)
+    energy = np.random.choice(np.linspace(5,25,3), 1)
     return np.round(energy_with_noise(energy))
 
 def energy_with_noise(energy):
