@@ -2,7 +2,7 @@ import numpy as np
 import pylab as pl
 import matplotlib.pyplot as plt
 
-def main():
+def generator(plt_value):
     P = {}
     for i in range(0,10000):
         theta = choose_theta()
@@ -28,8 +28,12 @@ def main():
     angles    = np.unique(data[:,1])
     distances = np.unique(data[:,2])
 
-    # plot_data(energies, angles, distances, data)
-    print energy_fixed_angle_probability(energies,data,angles[0],energies[0])
+    if plt_value == 1:
+        plot_data(energies, angles, distances, data)
+    # print energy_fixed_angle_probability(energies, data, angles[0], energies[0])
+
+    return data, energies, angles, distances
+
 
 def energy_fixed_angle_probability(energies,data,fixed_angle,wanted_energy):
     dd = np.empty([len(energies), 2])
@@ -77,7 +81,7 @@ def plot_data(energies,angles,distances,data):
 
 
 def choose_theta():
-    theta = np.random.choice(np.linspace(0,90,3), 1)
+    theta = np.random.choice(np.linspace(0,90,1), 1)
     # x=15
     # theta = np.random.choice(np.linspace(x+0.5,x+0.5,1), 1)
     return np.round(theta*np.pi/180,2)
@@ -106,4 +110,4 @@ def distance_calculator(v0,theta,time):
     return round(distance[0])
 
 if __name__ == '__main__':
-    main()
+    generator(1)
