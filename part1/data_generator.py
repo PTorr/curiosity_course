@@ -91,7 +91,7 @@ def choose_energy():
     return np.round(energy_with_noise(energy))
 
 def energy_with_noise(energy):
-    en = np.random.normal(0, 0.025*energy, 1)
+    en = np.random.normal(0, 0.05*energy, 1)
     return max(0,energy+en)
 
 def initial_velocity(energy):
@@ -107,7 +107,7 @@ def time_calculator(v0,theta):
 
 def distance_calculator(v0,theta,time):
     distance = v0*np.cos(theta)*time
-    return round(distance[0])
+    return round(distance)
 
 if __name__ == '__main__':
     generator(1)

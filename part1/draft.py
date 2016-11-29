@@ -1,6 +1,15 @@
 import numpy as np
 import data_generator as data_generator
 
+def main():
+    e = 15
+    e = data_generator.energy_with_noise(e)
+    theta = 45
+    theta = theta*np.pi/180
+    v0 = data_generator.initial_velocity(e)
+    time = data_generator.time_calculator(v0, theta)
+    d = data_generator.distance_calculator(v0, theta, time)
+    print d
 
 def distribution_calculator():
     [data, energies, angles, distances] = data_generator.generator(1)
@@ -24,4 +33,4 @@ def distances_distribution(d,wanted_distance):
     return dd
 
 if __name__ == '__main__':
-    distribution_calculator()
+    main()
