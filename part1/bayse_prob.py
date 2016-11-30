@@ -90,7 +90,7 @@ def bayes_prob():
 
         # stopping condition
         # if (np.max(np.abs(info_mat-dkl))<0.001):
-            # break
+            # break1
 
         info_mat[m, n] = dkl[m,n]
         # updating count for specific combination
