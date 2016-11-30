@@ -26,8 +26,7 @@ def bayes_prob():
     info_mat = 10e1 * np.ones([M, N])
     action_count = np.zeros([M, N])
     dkl = 10*np.ones([M, N])
-    prior_mat = np.ones([M, N, len(mu), len(sig)])
-    # post = np.ones([len(mu), len(sig)])
+    prior_mat = np.ones([M, N, len(mu), len(sig)])/sum(sum(np.ones([M, N, len(mu), len(sig)])))
 
     # creates the figure with the subplots
     fig = plt.figure('Energy and angle')
@@ -39,7 +38,9 @@ def bayes_prob():
 
     ax[3][0].set_zlim(0, 35)
     ax[3][0].view_init(30, 15)
-    ax[3][0].set_title('action count')
+    ax[3][0].set_title('throws count')
+    ax[3][0].set_xlabel('E[J]')
+    ax[3][0].set_ylabel('$\\theta$[$^o$]')
     ax[3][1].set_title('info mat')
 
     labels = []
@@ -57,7 +58,7 @@ def bayes_prob():
             ax[m][n].set_ylabel('$\mu$ [m]')
 
     # for i in range(50):
-    while (np.max(np.max(info_mat)) > 0.005):
+    while (np.max(np.max(info_mat)) > 0.05):
         # [nn, mm] = np.where(info_mat == np.max(np.max(info_mat)))
         # m = np.random.choice(mm)
         # n = nn[mm == m]
@@ -88,11 +89,9 @@ def bayes_prob():
         count_dkl_condition = 0
 
         # stopping condition
-        if (np.max(np.abs(info_mat-dkl))<0.001):
-            break
-            # count_dkl_condition += 1
-            # if(count_dkl_condition == 5):
-            #     break
+        # if (np.max(np.abs(info_mat-dkl))<0.001):
+            # break
+
         info_mat[m, n] = dkl[m,n]
         # updating count for specific combination
         action_count[m, n] += 1
