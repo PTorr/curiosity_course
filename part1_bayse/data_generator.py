@@ -31,6 +31,7 @@ def generator(plt_value):
     if plt_value == 1:
         plot_data(energies, angles, distances, data)
     # print energy_fixed_angle_probability(energies, data, angles[0], energies[0])
+    print data
 
     return data, energies, angles, distances
 
@@ -81,7 +82,7 @@ def plot_data(energies,angles,distances,data):
 
 
 def choose_theta():
-    theta = np.random.choice(np.linspace(0,90,1), 1)
+    theta = np.random.choice(np.linspace(0,90,3), 1)
     # x=15
     # theta = np.random.choice(np.linspace(x+0.5,x+0.5,1), 1)
     return np.round(theta*np.pi/180,2)
