@@ -37,8 +37,8 @@ def generator(plt_value):
 
 
 def data_to_file(N, M):
-    X = np.zeros([N, 200])
-    y = np.zeros([N, M])
+    X = np.zeros([N, 2])
+    y = np.zeros([N, 1])
     d = np.linspace(0, 45, M)  # 46
 
     e = np.linspace(5,30,100)
@@ -51,9 +51,9 @@ def data_to_file(N, M):
         time = time_calculator(v0, theta)
         distance = distance_calculator(v0, theta, time)
         # X[i, 0:100] = [energy_no/25, theta/90]
-        X[i, np.min(np.where(e > energy)) - 1] = 1
-        X[i, np.min(np.where(t > theta)) + 100 - 1] = 1
-        y[i, np.min(np.where(d > distance)) - 1] = 1
+        X[i, 0] = energy_no
+        X[i, 1] = theta
+        y[i, 0] = distance
 
     gen_data = np.hstack((X,y))
     np.savetxt("generated_data.csv", gen_data, delimiter=",",
@@ -105,15 +105,15 @@ def plot_data(energies,angles,distances,data):
 
 
 def choose_theta():
-    theta = np.random.choice(np.linspace(0,90,100), 1)
+    theta = np.random.choice(np.linspace(0,90,10), 1)
     # x=15
     # theta = np.random.choice(np.linspace(x+0.5,x+0.5,1), 1)
     # theta = 45
     return np.round(theta*np.pi/180,2)
 
 def choose_energy():
-    energy = np.random.choice(np.linspace(5,25,100), 1)
-    return energy, np.round(energy_with_noise(energy))
+    energy = np.random.choice(np.linspace(5,25,10), 1)
+    return energy, energy #np.round(energy_with_noise(energy))
 
 def energy_with_noise(energy):
     en = np.random.normal(0, 0.05*energy, 1)

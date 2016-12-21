@@ -16,13 +16,20 @@ def sigmoid(x):
 def sigmoid_output_to_derivative(output):
     return output * (1 - output)
 
+def squre_root(x):
+    return np.sqrt(x)
+def squre_root_to_derivative(x):
+    return 0.5/np.sqrt(x)
+
 
 def ann(x,y,synapse_0,synapse_1):
     # Feed forward through layers 0, 1, and 2
     layer_0 = x
     layer_1 = sigmoid(np.dot(layer_0, synapse_0))
     layer_1 = np.hstack((np.ones([len(layer_1), 1]), layer_1))
-    layer_2 = sigmoid(np.dot(layer_1, synapse_1))  # Think what the activation function we want for the last layer
+    # layer_2 = sigmoid(np.dot(layer_1, synapse_1))  # sigmoid
+    # layer_2 = np.dot(layer_1, synapse_1) # linear
+    layer_2 = squre_root(np.dot(layer_1, synapse_1)) # sqrt
 
     layer_2_error = layer_2 - y
 
@@ -34,17 +41,17 @@ M = 10 # for the binning vector
 
 data = np.genfromtxt('/home/torr/PycharmProjects/curiosity_course/part1_bayse/generated_data.csv',delimiter=',',skip_header=0)
 data = data[1:len(data)+1,:]
-input_size = 200
-X = data[:,0:input_size]
+X = data[:,0:2]
 X = np.hstack((np.ones([len(X),1]),X))
-y = data[:,input_size:len(data.T)+1]
+y = np.array([data[:,2]]).T
+y /= 1.1*np.max(y)
 N = len(data)
 x_train = X[0:N-0.2*N, :]
-y_train = y[0:N-0.2*N, :]
+y_train = np.array([y[0:N-0.2*N,0]]).T
 x_valid = X[N-0.2*N:N-0.1*N, :]
-y_valid = y[N-0.2*N:N-0.1*N, :]
+y_valid = np.array([y[N-0.2*N:N-0.1*N,0]]).T
 x_test = X[N-0.1*N:N, :]
-y_test = y[N-0.1*N:N, :]
+y_test = np.array([y[N-0.1*N:N,0]]).T
 
 
 for alpha in alphas:
@@ -52,11 +59,12 @@ for alpha in alphas:
     np.random.seed(1)
 
     # randomly initialize our weights with mean 0
-    hls = 100 # hidden_layer_size
-    synapse_0 = 2 * np.random.random((input_size+1, hls)) - 1
-    synapse_1 = 2 * np.random.random((hls+1, M)) - 1
+    hls = 140 # hidden_layer_size
+    input_size = len(x_train.T)
+    synapse_0 = 2 * np.random.random((input_size, hls)) - 1
+    synapse_1 = 2 * np.random.random((hls+1, 1)) - 1
 
-    num_of_iterations = 1000
+    num_of_iterations = 5000
     training_error = np.zeros([num_of_iterations, 2])
     validation_error = np.zeros([num_of_iterations, 2])
     test_error = np.zeros([num_of_iterations, 2])
@@ -73,10 +81,9 @@ for alpha in alphas:
         test_error[j, :] = [j, np.sum(layer_2t_error ** 2) / (2.0 * len(x_test))]
 
 
-        # if (j % 1000) == 0:
-        #     print "Error after " + str(j) + " iterations:" + str(np.mean(np.abs(layer_2_error)))
-
-        layer_2_delta = layer_2_error
+        # layer_2_delta = layer_2_error * sigmoid_output_to_derivative(layer_2) # sigmoid
+        # layer_2_delta = layer_2_error * layer_2 #linear
+        layer_2_delta = layer_2_error * squre_root_to_derivative(layer_2) #sqrt
 
         layer_1_error = layer_2_delta.dot(synapse_1.T)
 
@@ -97,13 +104,18 @@ for alpha in alphas:
     # plt.show()
 
     plt.figure('layer2t')
-    plt.pcolor(layer_2t[1:10,:])
+    plt.bar(np.linspace(0,len(layer_2t),len(layer_2t)), layer_2t)
     plt.figure('y')
-    plt.pcolor(y_test[1:10,:])
-    # print layer_2t.argmax(axis=1)
+    plt.bar(np.linspace(0,len(layer_2t),len(layer_2t)),y_test)
+    # print np.mean(y_test)
+    plt.figure('compare')
+    plt.plot(np.linspace(0,10,100),layer_2t[0:100],'b')
+    plt.plot(np.linspace(0,10,100),y_train[0:100],'r')
     plt.show()
 
-    # [layer_0t, layer_1t, layer_2t, layer_2t_error] = ann([25,90], [1,0,0,0,0,0,0,0,0,0])
-    # print layer_2t
+
+print layer_2t[0:10].T
+print y_train[0:10].T
+
 
 # print layer_2
