@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 
 
 # alphas = [0.001, 0.01, 0.1, 1, 10, 100, 1000]
-alphas = [0.0000001]
+alphas = [1e-8]
 
 # compute sigmoid nonlinearity
 def sigmoid(x):
@@ -102,15 +102,22 @@ for alpha in alphas:
     plt.legend()
     plt.ylim(0,np.max(training_error[:,1]))
     # plt.show()
+    a = str(alphas)
+    a = a.replace('.', '_')
+    fig_name = 'learning_rate' + str(a) + ' iterations' + str(num_of_iterations) + ' hls' + str(hls)
+    txt_name = fig_name + '.csv'
+    np.savetxt(txt_name, [training_error[-1, 1], validation_error[-1, 1], test_error[-1, 1]], delimiter=",",
+               header='train,valid,test')
+    plt.savefig(fig_name)
 
-    plt.figure('layer2t')
-    plt.bar(np.linspace(0,len(layer_2t),len(layer_2t)), layer_2t)
-    plt.figure('y')
-    plt.bar(np.linspace(0,len(layer_2t),len(layer_2t)),y_test)
-    # print np.mean(y_test)
-    plt.figure('compare')
-    plt.plot(np.linspace(0,10,100),layer_2t[0:100],'b')
-    plt.plot(np.linspace(0,10,100),y_train[0:100],'r')
+    # plt.figure('layer2t')
+    # plt.bar(np.linspace(0,len(layer_2t),len(layer_2t)), layer_2t)
+    # plt.figure('y')
+    # plt.bar(np.linspace(0,len(layer_2t),len(layer_2t)),y_test)
+    # # print np.mean(y_test)
+    # plt.figure('compare')
+    # plt.plot(np.linspace(0,10,100),layer_2t[0:100],'b')
+    # plt.plot(np.linspace(0,10,100),y_train[0:100],'r')
     plt.show()
 
 

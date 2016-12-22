@@ -4,10 +4,12 @@ from part1_bayse import data_generator as dg
 import matplotlib.pyplot as plt
 
 
-# alphas = [0.001, 0.01, 0.1, 1, 10, 100, 1000]
-alphas = [1e-9] # learning rate
-num_of_iterations = 3000
-hls = [140, 100, 50]  # hidden_layer_size
+alphas = [1e-1,1e-3,1e-5,1e-7,1e-9] # learning rate
+# alphas = [1e-9]
+num_of_iterations = 1000
+hl = {1: [140, 100, 50],2: [100, 140, 50],3:[50,100,140], 4: [150,100,50]}
+# hl = {1:[140, 100, 50]}  # hidden_layer_size
+# hls = [50,20,10]  # hidden_layer_size
 
 # compute sigmoid nonlinearity
 def sigmoid(x):
@@ -63,82 +65,83 @@ y_valid = np.array([y[N-0.2*N:N-0.1*N,0]]).T
 x_test = X[N-0.1*N:N, :]
 y_test = np.array([y[N-0.1*N:N,0]]).T
 
+for k in hl:
+    hls = hl[k]
+    min_validation = 1e20
+    print "\nTraining With hls: "+ str(hls)
+    for alpha in alphas:
+        print "\nTraining With Alpha:" + str(alpha)
+        np.random.seed(1)
 
-for alpha in alphas:
-    print "\nTraining With Alpha:" + str(alpha)
-    np.random.seed(1)
+        # randomly initialize our weights with mean 0
+        input_size = len(x_train.T)
+        synapse_0 = 2 * np.random.random((input_size, hls[0])) - 1
+        synapse_1 = 2 * np.random.random((hls[0]+1, hls[1])) - 1
+        synapse_2 = 2 * np.random.random((hls[1]+1, hls[2])) - 1
+        synapse_3 = 2 * np.random.random((hls[2]+1, 1)) - 1
 
-    # randomly initialize our weights with mean 0
-    input_size = len(x_train.T)
-    synapse_0 = 2 * np.random.random((input_size, hls[0])) - 1
-    synapse_1 = 2 * np.random.random((hls[0]+1, hls[1])) - 1
-    synapse_2 = 2 * np.random.random((hls[1]+1, hls[2])) - 1
-    synapse_3 = 2 * np.random.random((hls[2]+1, 1)) - 1
+        training_error = np.zeros([num_of_iterations, 2])
+        validation_error = np.zeros([num_of_iterations, 2])
+        test_error = np.zeros([num_of_iterations, 2])
 
-    training_error = np.zeros([num_of_iterations, 2])
-    validation_error = np.zeros([num_of_iterations, 2])
-    test_error = np.zeros([num_of_iterations, 2])
+        for j in xrange(num_of_iterations):
 
-    for j in xrange(num_of_iterations):
+            [layer_0, layer_1, layer_2, layer_3, layer_4, layer_4_error] = ann(x_train, y_train,synapse_0,synapse_1)
+            training_error[j,:] = [j,np.sum(layer_4_error**2)/(2.0*len(x_train))]
 
-        [layer_0, layer_1, layer_2, layer_3, layer_4, layer_4_error] = ann(x_train, y_train,synapse_0,synapse_1)
-        training_error[j,:] = [j,np.sum(layer_4_error**2)/(2.0*len(x_train))]
+            [layer_0v, layer_1v, layer_2v, layer_3v, layer_4v, layer_4v_error] = ann(x_valid, y_valid,synapse_0,synapse_1)
+            validation_error[j,:] = [j,np.sum(layer_4v_error**2)/(2.0*len(x_valid))]
 
-        [layer_0v, layer_1v, layer_2v, layer_3v, layer_4v, layer_4v_error] = ann(x_valid, y_valid,synapse_0,synapse_1)
-        validation_error[j,:] = [j,np.sum(layer_4v_error**2)/(2.0*len(x_valid))]
+            [layer_0t, layer_1t, layer_2t, layer_3t, layer_4t, layer_4t_error] = ann(x_test, y_test,synapse_0,synapse_1)
+            test_error[j, :] = [j, np.sum(layer_4t_error ** 2) / (2.0 * len(x_test))]
 
-        [layer_0t, layer_1t, layer_2t, layer_3t, layer_4t, layer_4t_error] = ann(x_test, y_test,synapse_0,synapse_1)
-        test_error[j, :] = [j, np.sum(layer_4t_error ** 2) / (2.0 * len(x_test))]
+            # layer_4_delta = layer_4_error * sigmoid_output_to_derivative(layer_4) # sigmoid
+            layer_4_delta = layer_4_error * ReLU_to_derivative(layer_4)
+            # layer_4_delta = layer_4_error * 0.5 #linear
 
-        # layer_4_delta = layer_4_error * sigmoid_output_to_derivative(layer_4) # sigmoid
-        layer_4_delta = layer_4_error * ReLU_to_derivative(layer_4)
-        # layer_4_delta = layer_4_error * 0.5 #linear
-        
-        layer_3_error = layer_4_delta.dot(synapse_3.T)
-        # layer_3_delta = layer_3_error * sigmoid_output_to_derivative(layer_3)
-        layer_3_delta = layer_3_error * ReLU_to_derivative(layer_3)
+            layer_3_error = layer_4_delta.dot(synapse_3.T)
+            # layer_3_delta = layer_3_error * sigmoid_output_to_derivative(layer_3)
+            layer_3_delta = layer_3_error * ReLU_to_derivative(layer_3)
 
-        layer_2_error = layer_3_delta[:,1:].dot(synapse_2.T)
-        layer_2_delta = layer_2_error * sigmoid_output_to_derivative(layer_2)
+            layer_2_error = layer_3_delta[:,1:].dot(synapse_2.T)
+            layer_2_delta = layer_2_error * sigmoid_output_to_derivative(layer_2)
 
-        layer_1_error = layer_2_delta[:,1:].dot(synapse_1.T)
-        layer_1_delta = layer_1_error * sigmoid_output_to_derivative(layer_1)
+            layer_1_error = layer_2_delta[:,1:].dot(synapse_1.T)
+            layer_1_delta = layer_1_error * sigmoid_output_to_derivative(layer_1)
 
-        synapse_3 -= alpha * (layer_3.T.dot(layer_4_delta))
-        synapse_2 -= alpha * (layer_2.T.dot(layer_3_delta[:,1:]))
-        synapse_1 -= alpha * (layer_1.T.dot(layer_2_delta[:,1:]))
-        synapse_0 -= alpha * (layer_0.T.dot(layer_1_delta[:,1:]))
+            synapse_3 -= alpha * (layer_3.T.dot(layer_4_delta))
+            synapse_2 -= alpha * (layer_2.T.dot(layer_3_delta[:,1:]))
+            synapse_1 -= alpha * (layer_1.T.dot(layer_2_delta[:,1:]))
+            synapse_0 -= alpha * (layer_0.T.dot(layer_1_delta[:,1:]))
 
-        if validation_error[j,1] > validation_error[j-1,1]:
-            pass
+            if validation_error[j,1] < min_validation:
+                min_validation = validation_error[j,1]
+            # elif validation_error[j,1] - min_validation > 1:
+            #     break
+            # if j!=0:
+            #     if training_error[j-1,1]-training_error[j,1] < 1e-5:
+            #         break
+        plt.figure('errors')
+        plt.plot(training_error[:,0],training_error[:,1],'b', label = 'train')
+        plt.plot(validation_error[:,0],validation_error[:,1],'r', label = 'validation')
+        plt.plot(test_error[:, 0], test_error[:, 1], 'g',label = 'test')
+        plt.legend()
+        plt.ylim(0,np.max(training_error[:,1]))
+        plt.xlabel('Epochs')
+        plt.ylabel('Loss function')
+        a = str(alpha)
+        a = a.replace('.','_')
+        fig_name = 'learning_rate' + str(a) + ' iterations' + str(num_of_iterations) + ' hls' + str(hls)
+        txt_name = fig_name+'.csv'
+        np.savetxt(txt_name, [training_error[-1,1],validation_error[-1,1],test_error[-1, 1]], delimiter=",", header='train,valid,test')
+        plt.savefig(fig_name)
+        plt.close("all")
+        # plt.show()
 
-    plt.figure('errors')
-    plt.plot(training_error[:,0],training_error[:,1],'b', label = 'train')
-    plt.plot(validation_error[:,0],validation_error[:,1],'r', label = 'validation')
-    plt.plot(test_error[:, 0], test_error[:, 1], 'g',label = 'test')
-    plt.legend()
-    plt.ylim(0,np.max(training_error[:,1]))
-    plt.xlabel('Epochs')
-    plt.ylabel('Loss function')
-    a = str(alphas)
-    a = a.replace('.','_')
-    fig_name = 'learning_rate' + str(a) + ' iterations' + str(num_of_iterations) + ' hls' + str(hls)
-    txt_name = fig_name+'.csv'
-    np.savetxt(txt_name, [training_error[-1,1],validation_error[-1,1],test_error[-1, 1]], delimiter=",", header='train,valid,test')
-    plt.savefig(fig_name)
-    # plt.show()
+        # plt.figure('layer_out')
+        # plt.bar(np.linspace(0,len(layer_4t),len(layer_4t)), layer_4t,color = 'blue',alpha = 0.1)
+        # plt.bar(np.linspace(0,len(layer_4t),len(layer_4t)), y_test,color = 'red',alpha = 0.2)
 
-    plt.figure('layer_out')
-    plt.bar(np.linspace(0,len(layer_4t),len(layer_4t)), layer_4t,color = 'blue',alpha = 0.1)
-    plt.bar(np.linspace(0,len(layer_4t),len(layer_4t)), y_test,color = 'red',alpha = 0.2)
-    plt.figure('y')
-    plt.bar(np.linspace(0,len(layer_4t),len(layer_4t)),y_test)
-
-    # print np.mean(y_test)
-    # plt.figure('compare')
-    # plt.scatter(np.linspace(0,10,100),layer_4t[0:100],'b')
-    # plt.scatter(np.linspace(0,10,100),y_train[0:100],'r')
-    plt.show()
 
 
 print layer_2t[0:10].T
