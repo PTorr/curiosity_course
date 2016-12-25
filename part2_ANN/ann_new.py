@@ -4,11 +4,11 @@ from part1_bayse import data_generator as dg
 import matplotlib.pyplot as plt
 
 
-alphas = [1e-1,1e-3,1e-5,1e-7,1e-9] # learning rate
-# alphas = [1e-9]
+# alphas = [1e-1,1e-3,1e-5,1e-7,1e-9] # learning rate
+alphas = [1e-6]
 num_of_iterations = 1000
-hl = {1: [140, 100, 50],2: [100, 140, 50],3:[50,100,140], 4: [150,100,50]}
-# hl = {1:[140, 100, 50]}  # hidden_layer_size
+# hl = {1: [140, 100, 50],2: [100, 140, 50],3:[50,100,140], 4: [150,100,50]}
+hl = {1:[50, 100, 140]}  # hidden_layer_size
 # hls = [50,20,10]  # hidden_layer_size
 
 # compute sigmoid nonlinearity
@@ -33,11 +33,33 @@ def ReLU_to_derivative(x):
     x[x >= 0] = 1
     return x
 
+class layer:
+    def __init__(self):
+        self.neurons = None
+        self.sigmoid = None
+        self.sigmoid_deriv = None
+        self.weights = None
+        self.error = None
+        self.delta = None
+
+    def update_weights(self,m,n):
+        self.weights = 2 * np.random.random((m, n)) - 1
+
+    def update_layer(self,layer_n,weights_n,func):
+        # self.sigmoid_func(np.dot(layer_n, weights_n))
+        func(np.dot(layer_n, weights_n))
+        self.neurons = np.hstack((np.ones([len(self.neurons), 1]), self.neurons))
+
+    def update_error(self,latern_delta):
+        self.error = latern_delta.dot(self.weights.T)
+        self.delta = self.error * sigmoid_output_to_derivative(self.neurons)
+
 
 def ann(x,y,synapse_0,synapse_1):
     # Feed forward through layers 0, 1, and 2
     layer_0 = x
     layer_1 = sigmoid(np.dot(layer_0, synapse_0))
+    # layer_11.update_layer(layer_11,layer_0,synapse_0,sigmoid())
     layer_1 = np.hstack((np.ones([len(layer_1), 1]), layer_1))
     layer_2 = sigmoid(np.dot(layer_1, synapse_1))
     layer_2 = np.hstack((np.ones([len(layer_2), 1]), layer_2))
@@ -65,6 +87,8 @@ y_valid = np.array([y[N-0.2*N:N-0.1*N,0]]).T
 x_test = X[N-0.1*N:N, :]
 y_test = np.array([y[N-0.1*N:N,0]]).T
 
+layer_11 = layer()
+
 for k in hl:
     hls = hl[k]
     min_validation = 1e20
@@ -77,6 +101,7 @@ for k in hl:
         input_size = len(x_train.T)
         synapse_0 = 2 * np.random.random((input_size, hls[0])) - 1
         synapse_1 = 2 * np.random.random((hls[0]+1, hls[1])) - 1
+        # layer_11.update_weights([0]+1, hls[1])
         synapse_2 = 2 * np.random.random((hls[1]+1, hls[2])) - 1
         synapse_3 = 2 * np.random.random((hls[2]+1, 1)) - 1
 
@@ -146,27 +171,3 @@ for k in hl:
 
 print layer_2t[0:10].T
 print y_train[0:10].T
-
-class layer:
-    def __init__(self,m,n):
-        self.neurons = None
-        self.sigmoid = None
-        self.sigmoid_deriv = None
-        self.weights = 2 * np.random.random((m, n)) - 1
-        self.error = None
-        self.delta = None
-
-    def update_layer(self,layer_n,weights_n,func):
-        # self.sigmoid_func(np.dot(layer_n, weights_n))
-        func(np.dot(layer_n, weights_n))
-        self.neurons = np.hstack((np.ones([len(self.neurons), 1]), self.neurons))
-
-    layer_3_error = layer_4_delta.dot(synapse_3.T)
-    layer_3_delta = layer_3_error * sigmoid_output_to_derivative(layer_3)
-
-    def sigmoid_func(self,x):
-        output = 1 / (1 + np.exp(-x))
-        self.neurons = output
-
-    def sigmoid_output_to_derivative_func(self,output):
-        self.sigmoid_deriv = output * (1 - output)

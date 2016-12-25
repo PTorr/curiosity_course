@@ -5,7 +5,8 @@ import matplotlib.pyplot as plt
 
 
 # alphas = [0.001, 0.01, 0.1, 1, 10, 100, 1000]
-alphas = [1e-8]
+alphas = [5e-7]
+num_of_iterations = 1000000
 
 # compute sigmoid nonlinearity
 def sigmoid(x):
@@ -21,15 +22,26 @@ def squre_root(x):
 def squre_root_to_derivative(x):
     return 0.5/np.sqrt(x)
 
+def ReLU(x):
+    x[x<0]=0
+    x[x>=0] = x[x>=0]
+    return x
+def ReLU_to_derivative(x):
+    x[x < 0] = 0
+    x[x >= 0] = 1
+    return x
+
 
 def ann(x,y,synapse_0,synapse_1):
     # Feed forward through layers 0, 1, and 2
     layer_0 = x
     layer_1 = sigmoid(np.dot(layer_0, synapse_0))
+    # layer_1 = ReLU(np.dot(layer_0, synapse_0))
     layer_1 = np.hstack((np.ones([len(layer_1), 1]), layer_1))
     # layer_2 = sigmoid(np.dot(layer_1, synapse_1))  # sigmoid
+    layer_2 = ReLU(np.dot(layer_1, synapse_1))  # sigmoid
     # layer_2 = np.dot(layer_1, synapse_1) # linear
-    layer_2 = squre_root(np.dot(layer_1, synapse_1)) # sqrt
+    # layer_2 = squre_root(np.dot(layer_1, synapse_1)) # sqrt
 
     layer_2_error = layer_2 - y
 
@@ -39,10 +51,11 @@ def ann(x,y,synapse_0,synapse_1):
 
 M = 10 # for the binning vector
 
-data = np.genfromtxt('/home/torr/PycharmProjects/curiosity_course/part1_bayse/generated_data.csv',delimiter=',',skip_header=0)
+data = np.genfromtxt('../part1_bayse/generated_data.csv',delimiter=',',skip_header=0)
 data = data[1:len(data)+1,:]
 X = data[:,0:2]
 X = np.hstack((np.ones([len(X),1]),X))
+X /= (np.amax(X,axis=0))
 y = np.array([data[:,2]]).T
 y /= 1.1*np.max(y)
 N = len(data)
@@ -59,12 +72,11 @@ for alpha in alphas:
     np.random.seed(1)
 
     # randomly initialize our weights with mean 0
-    hls = 140 # hidden_layer_size
+    hls = 10 # hidden_layer_size
     input_size = len(x_train.T)
     synapse_0 = 2 * np.random.random((input_size, hls)) - 1
     synapse_1 = 2 * np.random.random((hls+1, 1)) - 1
 
-    num_of_iterations = 5000
     training_error = np.zeros([num_of_iterations, 2])
     validation_error = np.zeros([num_of_iterations, 2])
     test_error = np.zeros([num_of_iterations, 2])
@@ -82,12 +94,15 @@ for alpha in alphas:
 
 
         # layer_2_delta = layer_2_error * sigmoid_output_to_derivative(layer_2) # sigmoid
+        layer_2_delta = layer_2_error * ReLU_to_derivative(layer_2)
         # layer_2_delta = layer_2_error * layer_2 #linear
-        layer_2_delta = layer_2_error * squre_root_to_derivative(layer_2) #sqrt
+        # layer_2_delta = layer_2_error * squre_root_to_derivative(layer_2) #sqrt
+
 
         layer_1_error = layer_2_delta.dot(synapse_1.T)
 
         layer_1_delta = layer_1_error * sigmoid_output_to_derivative(layer_1)
+        # layer_1_delta = layer_1_error * ReLU_to_derivative(layer_1)
 
         synapse_1 -= alpha * (layer_1.T.dot(layer_2_delta))
         synapse_0 -= alpha * (layer_0.T.dot(layer_1_delta[:,1:]))

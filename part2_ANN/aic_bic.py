@@ -5,7 +5,7 @@ import glob
 
 T = 7999
 
-path = '/home/torr/PycharmProjects/curiosity_course/part2_ANN/good examples'
+path = '../part2_ANN/good examples'
 extension = 'csv'
 os.chdir(path)
 csv_files = [i for i in glob.glob('*.{}'.format(extension))]
@@ -16,6 +16,7 @@ l = 0
 for f in csv_files:
     a = f.split('hls')
     c = a[1].split('.')
+    print c
     c = c[0].split('[')
     c = c[1].split(']')
     c = c[0].split(',')
@@ -48,5 +49,22 @@ for j in range(l):
         print np.isinf(AIC[j])
         AIC[j] = 0
 
-print AIC.values()
-print BIC.values()
+aic = AIC.values()
+bic = BIC.values()
+
+aic = np.asarray(aic)
+bic = np.asarray(bic)
+
+aic[np.isneginf(aic)] = 0
+bic[np.isneginf(bic)] = 0
+idxa = np.where(aic==np.min(aic))
+idxb = np.where(bic==np.min(bic))
+
+idxa = idxa[0]
+idxb = idxb[0]
+print csv_files[idxa[0]]
+print csv_files[idxb[0]]
+
+print aic[np.where(aic==np.min(aic))]
+print bic[np.where(bic==np.min(bic))]
+
