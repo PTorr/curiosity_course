@@ -106,14 +106,11 @@ def plot_data(energies,angles,distances,data):
 
 def choose_theta():
     theta = np.random.choice(np.linspace(0,90,10), 1)
-    # x=15
-    # theta = np.random.choice(np.linspace(x+0.5,x+0.5,1), 1)
-    # theta = 45
     return np.round(theta*np.pi/180,2)
 
 def choose_energy():
-    energy = np.random.choice(np.linspace(5,25,10), 1)
-    return energy, energy #np.round(energy_with_noise(energy))
+    energy = np.random.choice(np.linspace(0,25,10), 1)
+    return energy
 
 def energy_with_noise(energy):
     en = np.random.normal(0, 0.05*energy, 1)
