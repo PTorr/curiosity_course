@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 
 # alphas = [0.001, 0.01, 0.1, 1, 10, 100, 1000]
 alphas = [5e-7]
-num_of_iterations = 1000000
+num_of_iterations = 10000
 
 # compute sigmoid nonlinearity
 def sigmoid(x):
@@ -72,7 +72,7 @@ for alpha in alphas:
     np.random.seed(1)
 
     # randomly initialize our weights with mean 0
-    hls = 10 # hidden_layer_size
+    hls = 140 # hidden_layer_size
     input_size = len(x_train.T)
     synapse_0 = 2 * np.random.random((input_size, hls)) - 1
     synapse_1 = 2 * np.random.random((hls+1, 1)) - 1

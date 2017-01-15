@@ -4,11 +4,11 @@ from part1_bayse import data_generator as dg
 import matplotlib.pyplot as plt
 
 
-# alphas = [1e-1,1e-3,1e-5,1e-7,1e-9] # learning rate
-alphas = [1e-6]
+alphas = [1e-1,1e-3,1e-5,1e-7,1e-9] # learning rate
+# alphas = [1e-6]
 num_of_iterations = 1000
-# hl = {1: [140, 100, 50],2: [100, 140, 50],3:[50,100,140], 4: [150,100,50]}
-hl = {1:[50, 100, 140]}  # hidden_layer_size
+hl = {1: [140, 100, 50],2: [100, 140, 50],3:[50,100,140], 4: [150,100,50]}
+# hl = {1:[50, 100, 140]}  # hidden_layer_size
 # hls = [50,20,10]  # hidden_layer_size
 
 # compute sigmoid nonlinearity
@@ -141,11 +141,11 @@ for k in hl:
 
             if validation_error[j,1] < min_validation:
                 min_validation = validation_error[j,1]
-            # elif validation_error[j,1] - min_validation > 1:
-            #     break
-            # if j!=0:
-            #     if training_error[j-1,1]-training_error[j,1] < 1e-5:
-            #         break
+            elif validation_error[j,1] - min_validation > 1:
+                break
+            if j!=0:
+                if training_error[j-1,1]-training_error[j,1] < 1e-5:
+                    break
         plt.figure('errors')
         plt.plot(training_error[:,0],training_error[:,1],'b', label = 'train')
         plt.plot(validation_error[:,0],validation_error[:,1],'r', label = 'validation')
