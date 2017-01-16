@@ -22,6 +22,7 @@ def main():
 
     # for other runs
     training_error = np.zeros([len(mass), num_of_iterations, 2])
+    # synapse_0, synapse_1, synapse_2, synapse_3 = lnr.initialize_synapses(hls, input_size)
     for m in range(len(mass)):
         synapse_0, synapse_1, synapse_2, synapse_3 = lnr.initialize_synapses(hls, input_size)
         for i in range(num_of_iterations):
