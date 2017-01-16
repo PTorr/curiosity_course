@@ -62,8 +62,9 @@ def train_ann(hl,num_of_iterations,alphas,x,y,synapse_0,synapse_1,synapse_2,syna
         for j in xrange(num_of_iterations):
 
             [layer_0, layer_1, layer_2, layer_3, layer_4, layer_4_error] = ann(x, y,synapse_0,synapse_1,synapse_2,synapse_3)
-            print 'prediction = ',layer_4, 'real = ' ,y
             training_error[j,:] = [j,np.sum(layer_4_error**2)/(2.0*len(x))]
+            # print 'prediction = ',layer_4, 'real = ' ,y
+            print training_error[j,1]
 
             # layer_4_delta = training_error[j,1] * ReLU_to_derivative(layer_4)
             layer_4_delta = layer_4_error * ReLU_to_derivative(layer_4)
@@ -83,25 +84,21 @@ def train_ann(hl,num_of_iterations,alphas,x,y,synapse_0,synapse_1,synapse_2,syna
             synapse_1 -= alpha * (layer_1.T.dot(layer_2_delta[:,1:]))
             synapse_0 -= alpha * (layer_0.T.dot(layer_1_delta[:,1:]))
 
-    return training_error[j,1],synapse_0,synapse_1,synapse_2,synapse_3
+    return layer_4_error,synapse_0,synapse_1,synapse_2,synapse_3
 
-def learner(synapse_0,synapse_1,synapse_2,synapse_3):
+def learner(synapse_0,synapse_1,synapse_2,synapse_3,x):
     alphas = [1e-6]
     num_of_iterations = 1
     hl = {1: [50, 100, 140]}
 
 
-    theta = dg.choose_theta()
-    energy = dg.choose_energy()
+    theta = np.array([x[1]])
+    energy = np.array([x[0]])
     v0 = dg.initial_velocity(energy)
     time = dg.time_calculator(v0,theta)
     distance = dg.distance_calculator(v0,theta,time)
-
     X = np.array([energy/25.,theta/(np.pi/2.)])
     y = distance/45.
-    input_size = len(X)
-    hls = hl[1]
-
 
     l4_error,synapse_0,synapse_1,synapse_2,synapse_3 = train_ann(hl,num_of_iterations,alphas,X,y,synapse_0,synapse_1,synapse_2,synapse_3)
 
