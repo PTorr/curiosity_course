@@ -38,7 +38,10 @@ def main():
     plt.figure('errors')
     for m in range(len(mass)):
         c = ['r','b','g','y','k']
-        plt.plot(training_error[m,:, 0], training_error[m,:, 1], c[m], label='train')
+        plt.plot(training_error[m,:, 0], training_error[m,:, 1], c[m], label='m = '+str(mass[m])+'kg')
+        plt.xlabel('Epochs')
+        plt.ylabel('Loss function')
+    plt.legend()
     plt.show()
     print 't'
 def actions_creator():
