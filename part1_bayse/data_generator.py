@@ -121,6 +121,10 @@ def initial_velocity(energy):
     v0 = np.sqrt(2*energy/mass)
     return v0
 
+def initial_velocity_mass(energy,mass):
+    v0 = np.sqrt(2*energy/mass)
+    return v0
+
 def time_calculator(v0,theta):
     g = 9.81
     coeff = [-g/2, v0*np.sin(theta), 1.3]
