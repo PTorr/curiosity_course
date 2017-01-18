@@ -97,8 +97,11 @@ def learner(synapse_0,synapse_1,synapse_2,synapse_3,x,mass):
     v0 = dg.initial_velocity_mass(energy, mass)
     time = dg.time_calculator(v0,theta)
     distance = dg.distance_calculator(v0,theta,time)
+    max_v0 = dg.initial_velocity_mass(25, mass)
+    max_time = dg.time_calculator(v0, 45/180*np.pi)
+    max_distance = dg.distance_calculator(max_v0, 45/180*np.pi, max_time)
     X = np.array([energy/25.,theta/(np.pi/2.)])
-    y = distance/45.
+    y = distance/max_distance
 
     l4_error,training_error,synapse_0,synapse_1,synapse_2,synapse_3 = train_ann(hl,num_of_iterations,alphas,X,y,synapse_0,synapse_1,synapse_2,synapse_3)
 

@@ -1,6 +1,9 @@
 import learner as lnr
 import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib import style
+
+style.use('ggplot')
 
 def main():
     # for the first time intialize random weights for the synapses.
@@ -10,10 +13,11 @@ def main():
     hl = {1: [50, 100, 140]}
     hls = hl[1]
     input_size = 2
-    num_of_iterations = 1000
+    num_of_iterations = 10000
     mass = [0.145, 0.50, 0.100, 0.200, 0.250]
 
     actions = actions_creator()
+    actions_count = np.zeros(len(actions))
 
     act_mat = 1000*np.ones([len(actions),len(actions)])
 
@@ -32,10 +36,17 @@ def main():
                 prev_action = current_action
 
             action = actions[current_action]
+            actions_count[current_action] += 1
             l4_error, training_error[m,i,1], synapse_0, synapse_1, synapse_2, synapse_3 = lnr.learner(synapse_0, synapse_1, synapse_2, synapse_3, action, mass[m])
+            # print action, training_error[m,i,1]
             act_mat, next_action = critic_actor_v1(prev_action, current_action, act_mat, l4_error)
             prev_action = current_action
             current_action = next_action
+            if i % 1000 == 999 and m == 0:
+                st = '{0}, {1}'.format(mass[m],i)
+                plt.figure(st)
+                ax = plt.subplot2grid((1, 1), (0, 0))
+                ax.bar(np.linspace(0, len(actions), len(actions)), actions_count)
     plt.figure('errors')
     for m in range(len(mass)):
         c = ['r','b','g','y','k']
@@ -43,6 +54,7 @@ def main():
         plt.xlabel('Epochs')
         plt.ylabel('Loss function')
     plt.legend()
+
     plt.show()
     print 't'
 def actions_creator():
