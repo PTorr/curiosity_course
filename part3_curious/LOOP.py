@@ -38,7 +38,7 @@ def main():
             action = actions[current_action]
             actions_count[current_action] += 1
             l4_error, training_error[m,i,1], synapse_0, synapse_1, synapse_2, synapse_3 = lnr.learner(synapse_0, synapse_1, synapse_2, synapse_3, action, mass[m])
-            # print action, training_error[m,i,1]
+            # print action, l4_error**2
             act_mat, next_action = critic_actor_v1(prev_action, current_action, act_mat, l4_error)
             prev_action = current_action
             current_action = next_action
@@ -47,6 +47,7 @@ def main():
                 plt.figure(st)
                 ax = plt.subplot2grid((1, 1), (0, 0))
                 ax.bar(np.linspace(0, len(actions), len(actions)), actions_count)
+
     plt.figure('errors')
     for m in range(len(mass)):
         c = ['r','b','g','y','k']
@@ -54,7 +55,6 @@ def main():
         plt.xlabel('Epochs')
         plt.ylabel('Loss function')
     plt.legend()
-
     plt.show()
     print 't'
 def actions_creator():
@@ -90,6 +90,7 @@ def critic_v1(errors_vec,idx,error=None):
     return errors_vec, next_policy
 
 def critic_actor_v1(prev_action,current_action,act_mat,error):
+    act_mat_old = act_mat
     act_mat[prev_action,current_action] = error**2
     max_idx = np.where(act_mat[current_action,:] == np.max(act_mat[current_action]))
     max_idx = max_idx[0]
