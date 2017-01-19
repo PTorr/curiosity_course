@@ -2,7 +2,7 @@ import learner as lnr
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import style
-
+import string
 style.use('ggplot')
 
 def main():
@@ -14,7 +14,10 @@ def main():
     hls = hl[1]
     input_size = 2
     num_of_iterations = 10000
-    mass = [0.145, 0.50, 0.100, 0.200, 0.250]
+    mass = [0.145, 0.50, 0.100, 0.200, 0.250 , 0.500]
+    # mass = np.linspace(0.145,2,30)
+    mass = [0.145]
+    frame = 0
 
     actions = actions_creator()
     actions_count = np.zeros(len(actions))
@@ -50,17 +53,25 @@ def main():
 
     plt.figure('errors')
     for m in range(len(mass)):
-        c = ['r','b','g','y','k']
-        plt.plot(training_error[m,:, 0], training_error[m,:, 1], c[m], label='m = '+str(mass[m])+'kg')
-        plt.xlabel('Epochs')
+        c = ['r','b','g','y','k','m']
+        # plt.figure('m = '+str(mass[m])+'kg')
+        plt.plot(training_error[m,:, 0], training_error[m,:, 1],c[m], label='m = '+str(mass[m])+'kg')
+        plt.xlabel('Steps')
         plt.ylabel('Loss function')
+        plt.ylim([0,40])
+        image_names = 'graphs'
+        save = False
+        if save:
+            for t in range(10):
+                plt.savefig('./figs1/' + image_names + string.zfill(str(frame), 5) + '.png', format='png')
+                frame += 1
     plt.legend()
     plt.show()
     print 't'
 def actions_creator():
-    theta = np.linspace(0, 90, 3)
+    theta = np.linspace(0, 90, 10)
     theta = theta * np.pi/180
-    energy = np.linspace(5, 25, 3)
+    energy = np.linspace(5, 25, 10)
 
     lt = len(theta)
     le = len(energy)
